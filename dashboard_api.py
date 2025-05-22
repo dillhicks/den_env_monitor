@@ -41,8 +41,15 @@ def token_required(f):
         try:
             token = token.split(' ')[1]  # Remove 'Bearer ' prefix
             data = jwt.decode(token, JWT_SECRET, algorithms=[JWT_ALGORITHM])
-        except:
+            # Check if token is expired
+            if datetime.utcnow().timestamp() > data['exp']:
+                return jsonify({'message': 'Token has expired'}), 401
+        except jwt.ExpiredSignatureError:
+            return jsonify({'message': 'Token has expired'}), 401
+        except jwt.InvalidTokenError:
             return jsonify({'message': 'Token is invalid'}), 401
+        except Exception as e:
+            return jsonify({'message': f'Token validation error: {str(e)}'}), 401
         return f(*args, **kwargs)
     return decorated
 
@@ -58,9 +65,10 @@ def login():
     password_hash = hashlib.sha256(password.encode()).hexdigest()
     
     if password_hash == ADMIN_PASSWORD_HASH:
-        # Generate JWT token
+        # Generate JWT token with current timestamp
         token = jwt.encode({
-            'exp': datetime.utcnow() + timedelta(seconds=JWT_EXPIRATION)
+            'exp': datetime.utcnow() + timedelta(seconds=JWT_EXPIRATION),
+            'iat': datetime.utcnow()  # Issued at time
         }, JWT_SECRET, algorithm=JWT_ALGORITHM)
         
         return jsonify({

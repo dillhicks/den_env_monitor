@@ -449,6 +449,15 @@ function App() {
     
     try {
       const token = localStorage.getItem('token');
+      const expiry = localStorage.getItem('tokenExpiry');
+      
+      // Check if token is expired before making the request
+      if (Date.now() >= parseInt(expiry)) {
+        console.log('Token expired, logging out...');
+        handleLogout();
+        return;
+      }
+      
       const response = await axios.get(`http://localhost:5000/api/data?hours=${timeframe}`, {
         headers: {
           'Authorization': `Bearer ${token}`
@@ -459,12 +468,11 @@ function App() {
     } catch (err) {
       console.error('Error fetching data:', err);
       if (err.response?.status === 401) {
-        // Token expired or invalid
-        localStorage.removeItem('token');
-        localStorage.removeItem('tokenExpiry');
-        setIsAdmin(false);
+        console.log('Unauthorized, logging out...');
+        handleLogout();
+      } else {
+        setError('Failed to fetch data. Please try again later.');
       }
-      setError('Failed to fetch data. Please make sure the backend server is running.');
     } finally {
       setLoading(false);
     }
@@ -480,9 +488,12 @@ function App() {
   }, [timeframe, isAdmin]);
 
   const handleLogout = () => {
+    console.log('Logging out...');
     localStorage.removeItem('token');
     localStorage.removeItem('tokenExpiry');
     setIsAdmin(false);
+    setSensorData([]);
+    setError(null);
   };
 
   if (!isAdmin) {
