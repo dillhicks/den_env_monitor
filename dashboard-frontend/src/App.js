@@ -51,7 +51,7 @@ const EPA_STANDARDS = {
 // Get color based on value and type
 function getColorForValue(value, type) {
   const standards = EPA_STANDARDS[type];
-  for (const [category, { max, color }] of Object.entries(standards)) {
+  for (const [, { max, color }] of Object.entries(standards)) {
     if (value <= max) return color;
   }
   return standards.HAZARDOUS.color;
