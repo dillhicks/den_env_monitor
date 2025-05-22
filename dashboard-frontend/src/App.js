@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import axios from 'axios';
 import { Line } from 'react-chartjs-2';
 import {
@@ -444,7 +444,7 @@ function App() {
     return token && expiry && Date.now() < parseInt(expiry);
   });
 
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     if (!isAdmin) return;
     
     try {
@@ -476,7 +476,7 @@ function App() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [isAdmin, timeframe]);
 
   useEffect(() => {
     if (isAdmin) {
@@ -485,7 +485,7 @@ function App() {
       const interval = setInterval(fetchData, 3 * 60 * 1000);
       return () => clearInterval(interval);
     }
-  }, [timeframe, isAdmin]);
+  }, [isAdmin, fetchData]);
 
   const handleLogout = () => {
     console.log('Logging out...');
