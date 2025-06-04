@@ -25,7 +25,6 @@ JWT_SECRET = os.getenv('JWT_SECRET', secrets.token_hex(32))  # Generate a random
 JWT_ALGORITHM = 'HS256'
 JWT_EXPIRATION = 365 * 24 * 60 * 60  # 1 year in seconds (365 days * 24 hours * 60 minutes * 60 seconds)
 
-# Admin credentials (in a real app, these would be stored in a secure database)
 ADMIN_PASSWORD_HASH = hashlib.sha256(ADMIN_PASSWORD.encode()).hexdigest()
 
 client = CosmosClient(COSMOS_ENDPOINT, COSMOS_KEY)

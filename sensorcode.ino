@@ -19,9 +19,9 @@
 #include <HTTPClient.h>
 
 /* ---------- WiFi and Azure Function settings ---------- */
-const char* ssid = "YOUR_WIFI_SSID";      // Replace with your WiFi SSID
-const char* password = "YOUR_WIFI_PASSWORD";  // Replace with your WiFi password
-const char* azureFunctionUrl = "YOUR_AZURE_FUNCTION_URL";  // Replace with your Azure Function URL
+const char* ssid = "YOUR_WIFI_SSID";     
+const char* password = "YOUR_WIFI_PASSWORD";  
+const char* azureFunctionUrl = "YOUR_AZURE_FUNCTION_URL";  
 
 /* ---------- user-configurable section ---------- */
 constexpr uint8_t  SDA_PIN     = 21;
