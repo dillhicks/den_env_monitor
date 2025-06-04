@@ -1,54 +1,57 @@
-import { createClient } from '@azure/cosmos';
+import { CosmosClient } from '@azure/cosmos';
 import { jwtVerify, SignJWT } from 'jose';
-import { createHash } from 'crypto';
-
-// Environment variables
-const COSMOS_ENDPOINT = COSMOS_ENDPOINT;
-const COSMOS_KEY = COSMOS_KEY;
-const ADMIN_PASSWORD = ADMIN_PASSWORD;
-const JWT_SECRET = new TextEncoder().encode(JWT_SECRET);
-const DATABASE_NAME = DATABASE_NAME;
-const CONTAINER_NAME = CONTAINER_NAME;
-const JWT_EXPIRATION = 365 * 24 * 60 * 60; // 1 year in seconds
-
-// Initialize Cosmos DB client
-const client = new createClient({
-  endpoint: COSMOS_ENDPOINT,
-  key: COSMOS_KEY
-});
-
-const database = client.database(DATABASE_NAME);
-const container = database.container(CONTAINER_NAME);
-
-// Helper function to hash password
-function hashPassword(password) {
-  return createHash('sha256').update(password).digest('hex');
-}
-
-// Helper function to verify JWT token
-async function verifyToken(token) {
-  try {
-    const { payload } = await jwtVerify(token, JWT_SECRET);
-    if (Date.now() / 1000 > payload.exp) {
-      throw new Error('Token has expired');
-    }
-    return true;
-  } catch (error) {
-    return false;
-  }
-}
-
-// Helper function to generate JWT token
-async function generateToken() {
-  return await new SignJWT({})
-    .setProtectedHeader({ alg: 'HS256' })
-    .setIssuedAt()
-    .setExpirationTime('1y')
-    .sign(JWT_SECRET);
-}
 
 export default {
   async fetch(request, env, ctx) {
+    // Environment variables
+    const COSMOS_ENDPOINT = env.COSMOS_ENDPOINT;
+    const COSMOS_KEY = env.COSMOS_KEY;
+    const ADMIN_PASSWORD = env.ADMIN_PASSWORD;
+    const JWT_SECRET = new TextEncoder().encode(env.JWT_SECRET);
+    const DATABASE_NAME = env.DATABASE_NAME;
+    const CONTAINER_NAME = env.CONTAINER_NAME;
+    const JWT_EXPIRATION = 365 * 24 * 60 * 60; // 1 year in seconds
+
+    // Initialize Cosmos DB client
+    const client = new CosmosClient({
+      endpoint: COSMOS_ENDPOINT,
+      key: COSMOS_KEY
+    });
+
+    const database = client.database(DATABASE_NAME);
+    const container = database.container(CONTAINER_NAME);
+
+    // Helper function to hash password using Web Crypto API
+    async function hashPassword(password) {
+      const encoder = new TextEncoder();
+      const data = encoder.encode(password);
+      const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+      const hashArray = Array.from(new Uint8Array(hashBuffer));
+      return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+    }
+
+    // Helper function to verify JWT token
+    async function verifyToken(token) {
+      try {
+        const { payload } = await jwtVerify(token, JWT_SECRET);
+        if (Date.now() / 1000 > payload.exp) {
+          throw new Error('Token has expired');
+        }
+        return true;
+      } catch (error) {
+        return false;
+      }
+    }
+
+    // Helper function to generate JWT token
+    async function generateToken() {
+      return await new SignJWT({})
+        .setProtectedHeader({ alg: 'HS256' })
+        .setIssuedAt()
+        .setExpirationTime('1y')
+        .sign(JWT_SECRET);
+    }
+
     const url = new URL(request.url);
     const path = url.pathname;
 
@@ -78,8 +81,8 @@ export default {
         });
       }
 
-      const passwordHash = hashPassword(password);
-      const adminPasswordHash = hashPassword(ADMIN_PASSWORD);
+      const passwordHash = await hashPassword(password);
+      const adminPasswordHash = await hashPassword(ADMIN_PASSWORD);
 
       if (passwordHash === adminPasswordHash) {
         const token = await generateToken();
