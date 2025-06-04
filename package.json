@@ -1,0 +1,17 @@
+{
+  "name": "dendashboard-api",
+  "version": "1.0.0",
+  "description": "Den Dashboard API for Cloudflare Workers",
+  "main": "src/worker.js",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy"
+  },
+  "dependencies": {
+    "@azure/cosmos": "^4.0.0",
+    "jose": "^5.2.0"
+  },
+  "devDependencies": {
+    "wrangler": "^3.0.0"
+  }
+} 
