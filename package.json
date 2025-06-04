@@ -1,8 +1,8 @@
 {
-  "name": "dendashboard-api",
+  "name": "dendashboard",
   "version": "1.0.0",
-  "description": "Den Dashboard API for Cloudflare Workers",
-  "main": "src/worker.js",
+  "description": "Cloudflare Worker for DenDashboard",
+  "main": "src/index.js",
   "scripts": {
     "dev": "wrangler dev",
     "deploy": "wrangler deploy"

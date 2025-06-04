@@ -12,6 +12,9 @@ import {
   Legend,
 } from 'chart.js';
 
+// API URL configuration
+const API_URL = process.env.REACT_APP_API_URL || 'https://dendashboard.hicksdillon56.workers.dev';
+
 ChartJS.register(
   CategoryScale,
   LinearScale,
@@ -177,7 +180,7 @@ function LoginPage({ onLogin }) {
     setError('');
 
     try {
-      const response = await axios.post('http://localhost:5000/api/login', { password });
+      const response = await axios.post(`${API_URL}/api/login`, { password });
       const { token, expires_in } = response.data;
       
       // Store token and expiration
@@ -458,7 +461,7 @@ function App() {
         return;
       }
       
-      const response = await axios.get(`http://localhost:5000/api/data?hours=${timeframe}`, {
+      const response = await axios.get(`${API_URL}/api/data?hours=${timeframe}`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }

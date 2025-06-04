@@ -1,5 +1,0 @@
-numpy>=1.21.0
-smbus2>=0.4.3
-azure-functions
-azure-cosmos
-python-dateutil
