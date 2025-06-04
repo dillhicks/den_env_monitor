@@ -1,14 +1,8 @@
 # Den Dashboard
 
-A real-time environmental monitoring dashboard for tracking air quality and environmental conditions. The dashboard displays particulate matter (PM1.0, PM2.5, PM10), VOC index, temperature, and humidity readings.
+A real-time environmental monitoring system combining ESP32-based sensors with a web dashboard for tracking air quality and environmental conditions. The system collects data from strategically placed sensors and displays particulate matter (PM1.0, PM2.5, PM10), VOC index, temperature, and humidity readings in an intuitive interface.
 
-## Features
 
-- Real-time environmental data visualization
-- Historical data tracking with adjustable timeframes
-- EPA air quality standards compliance monitoring
-- Secure authentication system
-- Responsive design for desktop and mobile viewing
 
 ## Screenshot
 
@@ -18,10 +12,24 @@ A real-time environmental monitoring dashboard for tracking air quality and envi
 
 ## Technical Stack
 
+- Hardware: ESP32 microcontroller with environmental sensors
 - Frontend: React with Chart.js for data visualization
 - Backend: Cloudflare Workers
 - Database: Azure Cosmos DB
 - Authentication: JWT-based system
+- Communication: HTTP/HTTPS for sensor data transmission
+
+## Hardware Integration
+
+The dashboard receives data from an ESP32 microcontroller equipped with environmental sensors. The system includes:
+
+- ESP32 microcontroller for data collection and transmission
+- Temperature and humidity sensor (SHT31)
+- Air quality sensors for PM1.0, PM2.5, and PM10 measurements (PMS7003M)
+- VOC sensor for air quality index (SGP40)
+- Custom-designed magnetic enclosure for easy mounting and maintenance
+
+The ESP32 periodically sends sensor readings to the dashboard, which are then stored in the database and displayed in real-time.
 
 ## Setup
 
