@@ -1,0 +1,18 @@
+{
+  "name": "dendashboard-backend",
+  "version": "1.0.0",
+  "description": "Backend for Den Air Quality Dashboard",
+  "main": "src/index.js",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy"
+  },
+  "dependencies": {
+    "@azure/cosmos": "^4.4.1",
+    "@cloudflare/workers-types": "^4.20240208.0",
+    "hono": "^3.12.0"
+  },
+  "devDependencies": {
+    "wrangler": "^3.0.0"
+  }
+}

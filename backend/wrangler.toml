@@ -1,0 +1,12 @@
+name = "dendashboard"
+main = "src/index.js"
+compatibility_date = "2024-03-19"
+
+[assets]
+directory = "../frontend/dist"
+binding = "ASSETS"
+not_found_handling = "single-page-application"
+
+# Add your environment variables here
+[vars]
+NODE_ENV = "production"
