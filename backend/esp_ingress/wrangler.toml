@@ -1,0 +1,8 @@
+name = "esp-ingress"
+main = "src/index.js"
+compatibility_date = "2024-05-15"
+
+[[d1_databases]]
+binding = "DB" # Worker will access database through env.DB
+database_name = "sensor_readings"
+database_id = "YOUR_D1_DATABASE_ID"
