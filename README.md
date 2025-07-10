@@ -19,10 +19,10 @@ A real-time air quality monitoring dashboard that displays temperature, humidity
 - Modern CSS with responsive grid layouts
 
 ### Backend
-- Cloudflare workers w/ Hono.js, Flask for local testing
-- Azure Cosmos DB for data storage
+- Cloudflare Workers w/ Hono.js
+- Cloudflare D1 for data storage
 - JWT for authentication
 
-### Hardare
+### Hardware
 - ESP32 with Arduino 🤒
 
