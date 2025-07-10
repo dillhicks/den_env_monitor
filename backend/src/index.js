@@ -2,7 +2,6 @@
 import { Hono } from 'hono'
 import { cors } from 'hono/cors'
 import { jwt, sign } from 'hono/jwt'
-import { CosmosClient } from '@azure/cosmos'
 
 
 let ADMIN_PASSWORD_HASH = ''                             // 64-char hex
@@ -43,19 +42,11 @@ app.use(
 )
 
 /* ------------------------------------------------------------------ */
-/*  Cosmos initialiser (lazy)                                         */
+/*  Initialisers                                                      */
 /* ------------------------------------------------------------------ */
-let client, database, container
 app.use('*', async (c, next) => {
-  if (!client) {
-    client = new CosmosClient({
-      endpoint: c.env.COSMOS_ENDPOINT,
-      key: c.env.COSMOS_KEY,
-    })
-    database = client.database('dendashboard')
-    container = database.container('dendbcontainer')
-
-    await initAdminHash(c.env.ADMIN_PASSWORD)           // ❷
+  if (!ADMIN_PASSWORD_HASH) {
+    await initAdminHash(c.env.ADMIN_PASSWORD)
   }
   await next()
 })
@@ -77,12 +68,11 @@ app.get('/api/data', async (c) => {
   const startTime = new Date()
   startTime.setHours(startTime.getHours() - hours)
 
-  const query = `
-    SELECT * FROM c
-    WHERE c.timestamp >= '${startTime.toISOString()}'
-    ORDER BY c.timestamp ASC`
-  const { resources } = await container.items.query(query).fetchAll()
-  return c.json(resources)
+  const stmt = c.env.DB.prepare(
+    'SELECT * FROM sensor_data WHERE timestamp >= ? ORDER BY timestamp ASC'
+  )
+  const { results } = await stmt.bind(startTime.toISOString()).all()
+  return c.json(results)
 })
 
 /* ------------------------------------------------------------------ */
@@ -93,21 +83,21 @@ app.get('/api/daily-averages', async (c) => {
   const fromDate = new Date()
   fromDate.setDate(fromDate.getDate() - 14)
 
-  const query = `
-    SELECT SUBSTRING(c.timestamp,0,10) AS date,
-           AVG(c.temperature) AS avg_temperature,
-           AVG(c.humidity)    AS avg_humidity,
-           AVG(c.voc_index)   AS avg_voc_index,
-           AVG(c.pm1_0)       AS avg_pm1_0,
-           AVG(c.pm2_5)       AS avg_pm2_5,
-           AVG(c.pm10)        AS avg_pm10
-    FROM c
-    WHERE c.timestamp >= '${fromDate.toISOString()}'
-      AND c.timestamp <= '${toDate.toISOString()}'
-    GROUP BY SUBSTRING(c.timestamp,0,10)`
-  const { resources } = await container.items.query(query).fetchAll()
-  resources.sort((a, b) => a.date.localeCompare(b.date))
-  return c.json(resources)
+  const stmt = c.env.DB.prepare(`
+    SELECT SUBSTR(timestamp, 1, 10) AS date,
+           AVG(temperature) AS avg_temperature,
+           AVG(humidity)    AS avg_humidity,
+           AVG(voc_index)   AS avg_voc_index,
+           AVG(pm1_0)       AS avg_pm1_0,
+           AVG(pm2_5)       AS avg_pm2_5,
+           AVG(pm10_0)      AS avg_pm10
+    FROM sensor_data
+    WHERE timestamp >= ?1 AND timestamp <= ?2
+    GROUP BY date
+    ORDER BY date ASC
+  `)
+  const { results } = await stmt.bind(fromDate.toISOString(), toDate.toISOString()).all()
+  return c.json(results)
 })
 
 /* ------------------------------------------------------------------ */

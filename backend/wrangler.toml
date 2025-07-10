@@ -7,6 +7,11 @@ directory = "../frontend/dist"
 binding = "ASSETS"
 not_found_handling = "single-page-application"
 
+[[d1_databases]]
+binding = "DB"
+database_name = "sensor_data"
+database_id = "e7731c62-0403-4ce7-a32e-e47df7065cea"
+
 # Add your environment variables here
 [vars]
 NODE_ENV = "production"
