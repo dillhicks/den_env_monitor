@@ -516,12 +516,12 @@ function App() {
                 fontSize: '1.5rem', 
                 color: getReadingColor('pm', (sensorData[sensorData.length - 1].pm1_0 + 
                   sensorData[sensorData.length - 1].pm2_5 + 
-                  sensorData[sensorData.length - 1].pm10) / 3),
+                  sensorData[sensorData.length - 1].pm10_0) / 3),
                 fontWeight: 'bold'
               }}>
                 {(sensorData[sensorData.length - 1].pm1_0 + 
                   sensorData[sensorData.length - 1].pm2_5 + 
-                  sensorData[sensorData.length - 1].pm10).toFixed(1)} µg/m³
+                  sensorData[sensorData.length - 1].pm10_0).toFixed(1)} µg/m³
               </p>
             </div>
           </div>
@@ -781,7 +781,7 @@ function App() {
                     },
                     {
                       label: 'PM10',
-                      data: sensorData.map(d => d.pm10),
+                      data: sensorData.map(d => d.pm10_0),
                       borderColor: 'rgb(201, 203, 207)',
                       backgroundColor: 'rgba(201, 203, 207, 0.1)',
                       fill: true,
