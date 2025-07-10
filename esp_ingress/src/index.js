@@ -26,7 +26,7 @@ export default {
       const timestamp = new Date().toISOString();
 
       const stmt = env.DB.prepare(
-        'INSERT INTO sensor_readings (timestamp, temperature, humidity, voc_index, raw_voc, pm1_0, pm2_5, pm10, sample_count) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)'
+        'INSERT INTO sensor_data (timestamp, temperature, humidity, voc_index, raw_voc, pm1_0, pm2_5, pm10_0, sample_count) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)'
       );
       await stmt.bind(timestamp, temperature, humidity, voc_index, raw_voc, pm1_0, pm2_5, pm10, sample_count).run();
 
