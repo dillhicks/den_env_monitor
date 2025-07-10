@@ -39,4 +39,27 @@ export default {
       return new Response(`An error occurred: ${e.message}`, { status: 500 });
     }
   },
+
+  async scheduled(controller, env, ctx) {
+    try {
+      console.log("Running scheduled task to delete old data.");
+
+      const twoMonthsAgo = new Date();
+      twoMonthsAgo.setMonth(twoMonthsAgo.getMonth() - 2);
+      const isoTimestamp = twoMonthsAgo.toISOString();
+
+      const stmt = env.DB.prepare(
+        'DELETE FROM sensor_data WHERE timestamp < ?'
+      );
+      const { meta, success } = await stmt.bind(isoTimestamp).run();
+
+      if (success) {
+        console.log(`Successfully deleted ${meta.rows_written} rows older than ${isoTimestamp}.`);
+      } else {
+        console.error("Failed to delete old data.");
+      }
+    } catch (e) {
+      console.error("Error in scheduled task:", e);
+    }
+  },
 };

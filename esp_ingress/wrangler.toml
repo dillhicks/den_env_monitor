@@ -6,3 +6,6 @@ compatibility_date = "2024-05-15"
 binding = "DB" # Worker will access database through env.DB
 database_name = "sensor_data"
 database_id = "e7731c62-0403-4ce7-a32e-e47df7065cea"
+
+[triggers]
+crons = ["0 0 * * *"]
