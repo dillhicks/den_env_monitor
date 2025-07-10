@@ -36,7 +36,7 @@ export default {
         return new Response('Invalid JSON payload.', { status: 400 });
       }
       console.error(e);
-      return new Response('An error occurred.', { status: 500 });
+      return new Response(`An error occurred: ${e.message}`, { status: 500 });
     }
   },
 };
