@@ -18,10 +18,10 @@
 #include <WiFi.h>
 #include <HTTPClient.h>
 
-/* ---------- WiFi and Azure Function settings ---------- */
+/* ---------- WiFi and Cloudflare Worker settings ---------- */
 const char* ssid = "";     
 const char* password = "";  
-const char* azureFunctionUrl = "";  
+const char* workerUrl = "";  
 
 /* ---------- user-configurable section ---------- */
 constexpr uint8_t  SDA_PIN     = 21;
