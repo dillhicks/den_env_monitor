@@ -212,12 +212,12 @@ void setup() {
   Serial.println("\nConnected to WiFi");
 }
 
-void sendDataToAzure(float avgTemp, float avgHumidity, int32_t avgVocIndex, uint16_t avgRawVoc,
-                    uint16_t avgPM1_0, uint16_t avgPM2_5, uint16_t avgPM10) {
+void sendDataToCloudflare(float avgTemp, float avgHumidity, int32_t avgVocIndex, uint16_t avgRawVoc,
+                        uint16_t avgPM1_0, uint16_t avgPM2_5, uint16_t avgPM10, int sampleCount) {
     Serial.println("Attempting to send data");
   if (WiFi.status() == WL_CONNECTED) {
     HTTPClient http;
-    http.begin(azureFunctionUrl);
+    http.begin(workerUrl);
     http.addHeader("Content-Type", "application/json");
 
     // Create JSON payload
@@ -227,7 +227,8 @@ void sendDataToAzure(float avgTemp, float avgHumidity, int32_t avgVocIndex, uint
                         ",\"raw_voc\":" + String(avgRawVoc) +
                         ",\"pm1_0\":" + String(avgPM1_0) +
                         ",\"pm2_5\":" + String(avgPM2_5) +
-                        ",\"pm10\":" + String(avgPM10) + "}";
+                        ",\"pm10\":" + String(avgPM10) +
+                        ",\"sample_count\":" + String(sampleCount) + "}";
 
     int httpResponseCode = http.POST(jsonPayload);
     
@@ -292,7 +293,7 @@ void loop() {
       uint16_t avgPM2_5 = pm2_5Sum / sampleCount;
       uint16_t avgPM10 = pm10Sum / sampleCount;
 
-      Serial.println("\nSending 3-minute averages to Azure:");
+      Serial.println("\nSending 3-minute averages to Cloudflare:");
       Serial.printf("Temperature: %.2f°F\n", avgTemp);
       Serial.printf("Humidity: %.2f%%\n", avgHumidity);
       Serial.printf("VOC Index: %ld\n", avgVocIndex);
@@ -302,8 +303,8 @@ void loop() {
       Serial.printf("PM10: %u µg/m³\n", avgPM10);
       Serial.printf("Number of samples: %d\n", sampleCount);
 
-      sendDataToAzure(avgTemp, avgHumidity, avgVocIndex, avgRawVoc,
-                     avgPM1_0, avgPM2_5, avgPM10);
+      sendDataToCloudflare(avgTemp, avgHumidity, avgVocIndex, avgRawVoc,
+                         avgPM1_0, avgPM2_5, avgPM10, sampleCount);
 
       // Reset sums and counter
       tempSum = 0;
