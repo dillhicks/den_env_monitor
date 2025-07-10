@@ -21,7 +21,7 @@
 /* ---------- WiFi and Cloudflare Worker settings ---------- */
 const char* ssid = "Lassos";     
 const char* password = "18469c737f";  
-const char* workerUrl = "https://esp-ingress.hicksdillon56.workers.dev";  
+const char* workerUrl = "esp-ingress.hicksdillon56.workers.dev";  
 
 /* ---------- user-configurable section ---------- */
 constexpr uint8_t  SDA_PIN     = 21;
