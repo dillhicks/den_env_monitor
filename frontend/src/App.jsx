@@ -329,7 +329,7 @@ function App() {
       },
       {
         label: 'PM10',
-        data: sortedData.map(item => item.pm10),
+        data: sortedData.map(item => item.pm10_0),
         borderColor: 'rgb(201, 203, 207)',
         backgroundColor: 'rgba(201, 203, 207, 0.2)',
         tension: 0.1,
@@ -519,9 +519,9 @@ function App() {
                   sensorData[sensorData.length - 1].pm10_0) / 3),
                 fontWeight: 'bold'
               }}>
-                {(sensorData[sensorData.length - 1].pm1_0 + 
+                {((sensorData[sensorData.length - 1].pm1_0 + 
                   sensorData[sensorData.length - 1].pm2_5 + 
-                  sensorData[sensorData.length - 1].pm10_0).toFixed(1)} µg/m³
+                  sensorData[sensorData.length - 1].pm10_0) / 3).toFixed(1)} µg/m³
               </p>
             </div>
           </div>

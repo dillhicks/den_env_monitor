@@ -4,6 +4,12 @@ export default {
       return new Response('Expected POST method', { status: 405 });
     }
 
+    // Authenticate request
+    const authToken = request.headers.get('X-Auth-Token');
+    if (!authToken || authToken !== env.INGRESS_SECRET) {
+      return new Response('Unauthorized', { status: 401 });
+    }
+
     try {
       const data = await request.json();
       

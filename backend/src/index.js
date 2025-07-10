@@ -28,7 +28,7 @@ function timingSafeEqualHex(a, b) {
 const app = new Hono()
 
 app.onError((err, c) =>
-  c.json({ error: 'Internal Server Error', message: err.message }, 500)
+  c.json({ error: 'Internal Server Error' }, 500)
 )
 
 app.use(

@@ -22,6 +22,7 @@
 const char* ssid = "";     
 const char* password = "";  
 const char* workerUrl = "";  
+const char* authToken = ""; // Your ingress worker secret
 
 /* ---------- user-configurable section ---------- */
 constexpr uint8_t  SDA_PIN     = 21;
@@ -219,6 +220,7 @@ void sendDataToCloudflare(float avgTemp, float avgHumidity, int32_t avgVocIndex,
     HTTPClient http;
     http.begin(workerUrl);
     http.addHeader("Content-Type", "application/json");
+    http.addHeader("X-Auth-Token", authToken);
 
     // Create JSON payload
     String jsonPayload = "{\"temperature\":" + String(avgTemp, 2) + 
