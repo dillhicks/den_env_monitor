@@ -1,5 +1,6 @@
 // src/index.js -----------------------------------------------------------
 import { Hono } from 'hono'
+import { cache } from 'hono/cache'
 import { cors } from 'hono/cors'
 import { jwt, sign } from 'hono/jwt'
 
@@ -63,42 +64,56 @@ app.use('/api/*', (c, next) =>
 /* ------------------------------------------------------------------ */
 /*  /api/data                                      */
 /* ------------------------------------------------------------------ */
-app.get('/api/data', async (c) => {
-  const hours = parseInt(c.req.query('hours') || '24')
-  const startTime = new Date()
-  startTime.setHours(startTime.getHours() - hours)
+app.get(
+  '/api/data',
+  cache({
+    cacheName: 'api-cache',
+    cacheControl: 'max-age=300', // 5 minutes
+  }),
+  async (c) => {
+    const hours = parseInt(c.req.query('hours') || '24')
+    const startTime = new Date()
+    startTime.setHours(startTime.getHours() - hours)
 
-  const stmt = c.env.DB.prepare(
-    'SELECT * FROM sensor_data WHERE timestamp >= ? ORDER BY timestamp ASC'
-  )
-  const { results } = await stmt.bind(startTime.toISOString()).all()
-  return c.json(results)
-})
+    const stmt = c.env.DB.prepare(
+      'SELECT * FROM sensor_data WHERE timestamp >= ? ORDER BY timestamp ASC'
+    )
+    const { results } = await stmt.bind(startTime.toISOString()).all()
+    return c.json(results)
+  },
+)
 
 /* ------------------------------------------------------------------ */
 /*  /api/daily-averages                               */
 /* ------------------------------------------------------------------ */
-app.get('/api/daily-averages', async (c) => {
-  const toDate = new Date()
-  const fromDate = new Date()
-  fromDate.setDate(fromDate.getDate() - 14)
+app.get(
+  '/api/daily-averages',
+  cache({
+    cacheName: 'api-cache',
+    cacheControl: 'max-age=3600', // 1 hour
+  }),
+  async (c) => {
+    const toDate = new Date()
+    const fromDate = new Date()
+    fromDate.setDate(fromDate.getDate() - 14)
 
-  const stmt = c.env.DB.prepare(`
-    SELECT SUBSTR(timestamp, 1, 10) AS date,
-           AVG(temperature) AS avg_temperature,
-           AVG(humidity)    AS avg_humidity,
-           AVG(voc_index)   AS avg_voc_index,
-           AVG(pm1_0)       AS avg_pm1_0,
-           AVG(pm2_5)       AS avg_pm2_5,
-           AVG(pm10_0)      AS avg_pm10
-    FROM sensor_data
-    WHERE timestamp >= ?1 AND timestamp <= ?2
-    GROUP BY date
-    ORDER BY date ASC
-  `)
-  const { results } = await stmt.bind(fromDate.toISOString(), toDate.toISOString()).all()
-  return c.json(results)
-})
+    const stmt = c.env.DB.prepare(`
+      SELECT SUBSTR(timestamp, 1, 10) AS date,
+             AVG(temperature) AS avg_temperature,
+             AVG(humidity)    AS avg_humidity,
+             AVG(voc_index)   AS avg_voc_index,
+             AVG(pm1_0)       AS avg_pm1_0,
+             AVG(pm2_5)       AS avg_pm2_5,
+             AVG(pm10_0)      AS avg_pm10
+      FROM sensor_data
+      WHERE timestamp >= ?1 AND timestamp <= ?2
+      GROUP BY date
+      ORDER BY date ASC
+    `)
+    const { results } = await stmt.bind(fromDate.toISOString(), toDate.toISOString()).all()
+    return c.json(results)
+  },
+)
 
 /* ------------------------------------------------------------------ */
 /*  /api/login – hash-once compare                                    */
